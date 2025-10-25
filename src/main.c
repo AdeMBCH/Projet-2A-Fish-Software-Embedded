@@ -7,6 +7,8 @@
 #include "msg_router.h"
 #include "uart_commands.h"
 
+#include "servo_ctrl.h"
+
 #define RB_RX_SZ   2048
 #define PAYLOAD_SZ 512
 
@@ -17,6 +19,8 @@ static uint8_t    rb_rx_mem[RB_RX_SZ];
 static FrameCodec codec;
 static uint8_t    payload_buf[PAYLOAD_SZ];
 
+static ServoCtrl sc;
+
 static void on_ping(const DecodedFrameMsg *m){
     (void)m;
     const char pong[] = "pong";
@@ -24,6 +28,13 @@ static void on_ping(const DecodedFrameMsg *m){
 }
 
 void app_main(void){
+    sc_init(&sc, 18);
+    sc_set_profile(&sc, 1.0f, 30.0f, 0.0f); // 1 Hz, ±30°
+    sc_start(&sc);
+
+    xTaskCreate(servo_task, "servo_task", 3072, &sc, 8, NULL);
+
+
     // 115200 8N1 on configurable pins
     UartPortCfg cfg = { .uart_num=UART_NUM_1, .tx_gpio=17, .rx_gpio=16, .baud=115200, .rx_timeout_ms=300 };
     up_init(&port, &cfg);
