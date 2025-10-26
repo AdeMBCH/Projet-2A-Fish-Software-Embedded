@@ -33,11 +33,17 @@ bool servo_hal_init(ServoHAL *h, const ServoHALCfg *cfg){
 }
 
 bool servo_hal_write_pulse_us(ServoHAL *h, uint16_t pulse_us){
-    if(!h || !h->ready) return false;
+    if(!h || !h->ready){
+        return false;
+    }
     const uint32_t period_us = 20000; // 50 Hz
-    if(pulse_us > period_us) pulse_us = period_us;
+    if(pulse_us > period_us){
+        pulse_us = period_us;
+    }
     uint32_t duty = (uint32_t)((uint64_t)pulse_us * h->max_duty / period_us);
-    if(duty > h->max_duty) duty = h->max_duty;
+    if(duty > h->max_duty){
+        duty = h->max_duty;
+    }
 
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_HIGH_SPEED_MODE, (ledc_channel_t)h->cfg.channel, duty));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_HIGH_SPEED_MODE, (ledc_channel_t)h->cfg.channel));
