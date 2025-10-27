@@ -7,13 +7,17 @@
 #include "frame_codec.h"
 #include "uart_port.h"
 
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+
 typedef struct {
     UartPort *port;
     RingBuffer *rb_rx;
     FrameCodec *codec;
-    QueueHandle_t q_frames_rx; // queue of Frame copies (small fixed struct + payload copy)
-    QueueHandle_t q_frames_tx; // queue of Frame to send
-    uint8_t enc_buf[600];      // encoded scratch
+    QueueHandle_t q_frames_rx;
+    QueueHandle_t q_frames_tx;
+    uint8_t enc_buf[600];
+    TaskHandle_t dec_task;   // +++ handle du décodeur pour notify
 } UartLink;
 
 typedef struct {

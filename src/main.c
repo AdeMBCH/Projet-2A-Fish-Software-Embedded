@@ -1,5 +1,6 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "priority.h"
 #include "uart_port.h"
 #include "ring_buffer.h"
 #include "frame_codec.h"
@@ -21,34 +22,42 @@ static uint8_t    payload_buf[PAYLOAD_SZ];
 
 static ServoCtrl stail;
 
+static MsgRouter mr;
+static RouterTaskArgs rargs;
+
 static void on_ping(const DecodedFrameMsg *m){
     (void)m;
     const char pong[] = "pong";
     ul_send(&link, UART_CMD_PONG, (const uint8_t*)pong, sizeof(pong)-1);
 }
 
-void app_main(void){
+ void app_main(void){
+    //Servo
     sc_init(&stail, 18);
-    st_set_us_limits(&stail.model, 800, 1500, 2200);
-    sc_set_profile(&stail, 10.0f, 30.0f, 0.0f); // 1 Hz, ±30°
+    st_set_us_limits(&stail.model, 1000,1500,2000);
+    sc_set_profile(&stail, 0.8f, 60.f, 0.f);
     sc_start(&stail);
 
-    xTaskCreate(servo_task, "servo_task", 3072, &stail, 8, NULL);
+    //UART
+    UartPortCfg cfg={ .uart_num=UART_NUM_2, .tx_gpio=17, .rx_gpio=16, .baud=115200, .rx_timeout_ms=50 };
+    up_init(&port,&cfg);
+    rb_init(&rb_rx, rb_rx_mem, sizeof(rb_rx_mem));
+    fc_init(&codec, payload_buf, sizeof(payload_buf));
+    ul_init(&link, &port, &rb_rx, &codec, 32, 32);
+    
+    //Router
+    mr.on_ping  = on_ping;
+    mr.on_text  = NULL;
+    mr.on_action = NULL;
+    rargs.ul = &link;
+    rargs.mr = &mr;
 
+    
+    // Tâches
+    xTaskCreatePinnedToCore(servo_task, "servo_task", 3072, &stail, PRIO_CTRL, NULL, SERVOCORE);
+    xTaskCreatePinnedToCore(ul_uart_rx_task,     "ul_rx", 4096, &link, PRIO_UART_RX, NULL, COMCORE);
+    xTaskCreatePinnedToCore(ul_frame_decode_task,"ul_dec",4096, &link, PRIO_DEC,     NULL, COMCORE);
+    xTaskCreatePinnedToCore(ul_uart_tx_task,     "ul_tx", 4096, &link, PRIO_UART_TX, NULL, COMCORE);
+    xTaskCreatePinnedToCore(router_task,         "router",4096, &rargs,PRIO_ROUTER,  NULL, COMCORE);
 
-    // // 115200 8N1 on configurable pins
-    // UartPortCfg cfg = { .uart_num=UART_NUM_1, .tx_gpio=17, .rx_gpio=16, .baud=115200, .rx_timeout_ms=300 };
-    // up_init(&port, &cfg);
-
-    // rb_init(&rb_rx, rb_rx_mem, sizeof(rb_rx_mem));
-    // fc_init(&codec, payload_buf, sizeof(payload_buf));
-    // ul_init(&link, &port, &rb_rx, &codec, 10, 10);
-
-    // xTaskCreate(ul_uart_rx_task,"ul_rx",4096, &link, 10, NULL);
-    // xTaskCreate(ul_frame_decode_task,"ul_dec",4096, &link, 9, NULL);
-    // xTaskCreate(ul_uart_tx_task,"ul_tx",4096, &link, 9, NULL);
-
-    // MsgRouter mr = { .on_ping = on_ping };
-    // mr_run(&mr, &link); // never returns
-
-    }
+}
