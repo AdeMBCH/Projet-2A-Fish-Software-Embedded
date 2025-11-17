@@ -9,6 +9,7 @@
 #include "uart_commands.h"
 
 #include "servo_ctrl.h"
+#include "tofm.h"
 
 #define RB_RX_SZ   2048
 #define PAYLOAD_SZ 512
@@ -59,13 +60,14 @@ static void on_ping(const DecodedFrameMsg *m){
     rargs.ul = &link;
     rargs.mr = &mr;
 
-    
     // Tâches
-    xTaskCreatePinnedToCore(servo_task, "servo_tasktest", 3072, &stail2, PRIO_CTRL, NULL, SERVOCORE);
-    xTaskCreatePinnedToCore(servo_task, "servo_task", 3072, &stail, PRIO_CTRL, NULL, SERVOCORE);
-    xTaskCreatePinnedToCore(ul_uart_rx_task,     "ul_rx", 4096, &link, PRIO_UART_RX, NULL, COMCORE);
-    xTaskCreatePinnedToCore(ul_frame_decode_task,"ul_dec",4096, &link, PRIO_DEC,     NULL, COMCORE);
-    xTaskCreatePinnedToCore(ul_uart_tx_task,     "ul_tx", 4096, &link, PRIO_UART_TX, NULL, COMCORE);
-    xTaskCreatePinnedToCore(router_task,         "router",4096, &rargs,PRIO_ROUTER,  NULL, COMCORE);
+
+    xTaskCreatePinnedToCore(tof_task, "tof_task", 4096, NULL, PRIO_CTRL, NULL, COMCORE);
+    // xTaskCreatePinnedToCore(servo_task, "servo_tasktest", 3072, &stail2, PRIO_CTRL, NULL, SERVOCORE);
+    // xTaskCreatePinnedToCore(servo_task, "servo_task", 3072, &stail, PRIO_CTRL, NULL, SERVOCORE);
+    // xTaskCreatePinnedToCore(ul_uart_rx_task,     "ul_rx", 4096, &link, PRIO_UART_RX, NULL, COMCORE);
+    // xTaskCreatePinnedToCore(ul_frame_decode_task,"ul_dec",4096, &link, PRIO_DEC,     NULL, COMCORE);
+    // xTaskCreatePinnedToCore(ul_uart_tx_task,     "ul_tx", 4096, &link, PRIO_UART_TX, NULL, COMCORE);
+    // xTaskCreatePinnedToCore(router_task,         "router",4096, &rargs,PRIO_ROUTER,  NULL, COMCORE);
 
 }
