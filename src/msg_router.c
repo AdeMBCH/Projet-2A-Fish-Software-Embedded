@@ -3,6 +3,7 @@
 #include "freertos/task.h"
 #include "esp_log.h"
 
+
 static void default_sink(const DecodedFrameMsg *m)
 {
     (void)m;
@@ -24,6 +25,13 @@ void mr_run(MsgRouter *mr, UartLink *ul)
                 break;
             case UART_CMD_ACTION:
                 if (mr->on_action) mr->on_action(&m);
+                break;
+            case UART_CMD_SERVO_STOP:
+                if (mr->app_on_servo_stop) mr->app_on_servo_stop(&m);
+                break;
+
+            case UART_CMD_SERVO_ENABLE:
+                if (mr->app_on_servo_enable) mr->app_on_servo_enable(&m);
                 break;
             default:
                 default_sink(&m);

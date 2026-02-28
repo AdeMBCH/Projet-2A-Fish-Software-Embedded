@@ -2,5 +2,6 @@
     "files.associations": {
         "task.h": "c",
         "freertos.h": "c"
-    }
+    },
+    "idf.currentSetup": "/home/adembch/esp/v5.5.1/esp-idf"
 }

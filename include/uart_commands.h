@@ -27,13 +27,17 @@ typedef enum {
 
     /* Événements internes (pas envoyés sur le fil) */
     UART_EVT_DECOD_OK  = 0x00F0,
-    UART_EVT_DECOD_ERR = 0x00F1
+    UART_EVT_DECOD_ERR = 0x00F1,
+
+    /* Commandes applicatives robot */
+    UART_CMD_SERVO_STOP   = 0x0100, /* payload: vide -> stop (servo à 0 / neutre) */
+    UART_CMD_SERVO_ENABLE = 0x0101 /* payload: vide -> reprise fonctionnement normal */
+    
+
 } uart_cmd_t;
 
 /* Codes d’erreur pour NACK */
 typedef enum {
-    UART_ERR_NONE          = 0x00,
-    UART_ERR_BAD_CRC       = 0x01,
     UART_ERR_LEN_OVERSIZE  = 0x02,
     UART_ERR_UNKNOWN_FUNC  = 0x03,
     UART_ERR_BUSY          = 0x04

@@ -13,6 +13,8 @@ typedef struct {
     msg_handler_t on_text;
     msg_handler_t on_ping;
     msg_handler_t on_action;
+    msg_handler_t app_on_servo_enable;
+    msg_handler_t app_on_servo_stop;
     // Possible d'ajouter d'autres
 } MsgRouter;
 

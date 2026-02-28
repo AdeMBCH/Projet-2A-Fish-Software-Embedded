@@ -150,9 +150,9 @@ void fish_ctrl_init(FishCtrl *rc, ServoCtrl *servo, const FishMotionParams *para
     }
 
     // Paramètres par défaut
-    rc->obstacle_threshold_mm = 400;                    // 40 cm
+    rc->obstacle_threshold_mm = 100;                    // 10 cm
     rc->period_ticks          = pdMS_TO_TICKS(50);      // 20 Hz
-    rc->min_turn_ticks        = pdMS_TO_TICKS(700);     // ~0.7 s min de virage
+    rc->min_turn_ticks        = pdMS_TO_TICKS(1000);     // ~1 s min de virage
 
     rc->state             = FISH_STATE_IDLE;
     rc->state_entry_tick  = xTaskGetTickCount();
