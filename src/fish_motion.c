@@ -54,8 +54,8 @@ void fm_turn_left(FishMotion *fm)
         return;
     }
 
-    // Convention: offset positif = virage à gauche
-    float center = fm->params.forward_center_deg + fm->params.turn_center_offset_deg;
+    // Convention: offset négatif = virage à gauche
+    float center = fm->params.forward_center_deg - fm->params.turn_center_offset_deg;
 
     sc_set_profile(fm->servo,
                    fm->params.turn_freq_hz,
@@ -70,8 +70,8 @@ void fm_turn_right(FishMotion *fm)
         return;
     }
 
-    // Offset négatif = virage à droite.
-    float center = fm->params.forward_center_deg - fm->params.turn_center_offset_deg;
+    // Offset positif = virage à droite.
+    float center = fm->params.forward_center_deg + fm->params.turn_center_offset_deg;
 
     sc_set_profile(fm->servo,
                    fm->params.turn_freq_hz,
