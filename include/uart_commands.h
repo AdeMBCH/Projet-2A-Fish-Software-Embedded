@@ -31,7 +31,9 @@ typedef enum {
 
     /* Commandes applicatives robot */
     UART_CMD_SERVO_STOP   = 0x0100, /* payload: vide -> stop (servo à 0 / neutre) */
-    UART_CMD_SERVO_ENABLE = 0x0101 /* payload: vide -> reprise fonctionnement normal */
+    UART_CMD_SERVO_ENABLE = 0x0101, /* payload: vide -> reprise fonctionnement normal (avance) */
+    UART_CMD_SERVO_LEFT   = 0x0102, /* payload: vide -> virage gauche (centre décalé) */
+    UART_CMD_SERVO_RIGHT  = 0x0103  /* payload: vide -> virage droite (centre décalé) */
     
 
 } uart_cmd_t;

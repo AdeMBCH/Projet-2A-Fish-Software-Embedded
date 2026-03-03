@@ -33,6 +33,12 @@ void mr_run(MsgRouter *mr, UartLink *ul)
             case UART_CMD_SERVO_ENABLE:
                 if (mr->app_on_servo_enable) mr->app_on_servo_enable(&m);
                 break;
+            case UART_CMD_SERVO_LEFT:
+                if (mr->app_on_servo_left) mr->app_on_servo_left(&m);
+                break;
+            case UART_CMD_SERVO_RIGHT:
+                if (mr->app_on_servo_right) mr->app_on_servo_right(&m);
+                break;
             default:
                 default_sink(&m);
                 break;

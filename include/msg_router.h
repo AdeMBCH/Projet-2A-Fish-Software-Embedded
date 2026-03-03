@@ -15,6 +15,8 @@ typedef struct {
     msg_handler_t on_action;
     msg_handler_t app_on_servo_enable;
     msg_handler_t app_on_servo_stop;
+    msg_handler_t app_on_servo_left;
+    msg_handler_t app_on_servo_right;
     // Possible d'ajouter d'autres
 } MsgRouter;
 

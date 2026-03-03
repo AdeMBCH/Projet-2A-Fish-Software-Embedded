@@ -54,7 +54,7 @@ void fm_turn_left(FishMotion *fm)
         return;
     }
 
-    // Convention: offset positif = virage à gauche (à vérifier sur ton montage).
+    // Convention: offset positif = virage à gauche
     float center = fm->params.forward_center_deg + fm->params.turn_center_offset_deg;
 
     sc_set_profile(fm->servo,

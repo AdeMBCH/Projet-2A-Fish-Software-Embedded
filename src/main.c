@@ -24,6 +24,7 @@ static FrameCodec codec;
 static uint8_t    payload_buf[PAYLOAD_SZ];
 
 static ServoCtrl stail;
+static FishMotion fish_motion;
 // static ServoCtrl stail2;
 
 static MsgRouter mr;
@@ -43,14 +44,25 @@ static void on_ping(const DecodedFrameMsg *m){
 static void app_on_servo_stop(const DecodedFrameMsg *m)
 {
     (void)m;
-    sc_stop(&stail);
+    fm_stop(&fish_motion);
 }
 
 static void app_on_servo_enable(const DecodedFrameMsg *m)
 {
     (void)m;
-    sc_set_profile(&stail, 6.0f, 45.f, 0.f);
-    sc_start(&stail);
+    fm_forward(&fish_motion);
+}
+
+static void app_on_servo_left(const DecodedFrameMsg *m)
+{
+    (void)m;
+    fm_turn_left(&fish_motion);
+}
+
+static void app_on_servo_right(const DecodedFrameMsg *m)
+{
+    (void)m;
+    fm_turn_right(&fish_motion);
 }
 
 
@@ -58,6 +70,16 @@ static void app_on_servo_enable(const DecodedFrameMsg *m)
     //Servo
     sc_init(&stail, 19);
     st_set_us_limits(&stail.model, 1000,1500,2000);
+    FishMotionParams params = {
+        .forward_freq_hz        = 6.0f,
+        .forward_amp_deg        = 45.0f,
+        .forward_center_deg     = 0.0f,
+        .turn_freq_hz           = 6.0f,
+        .turn_amp_deg           = 45.0f,
+        .turn_center_offset_deg = 30.0f
+    };
+    fm_init(&fish_motion, &stail, &params);
+    fm_stop(&fish_motion);
     // sc_set_profile(&stail, 2.0f, 60.f, 0.f);
     // sc_start(&stail);
 
@@ -80,6 +102,8 @@ static void app_on_servo_enable(const DecodedFrameMsg *m)
     mr.on_action = NULL;
     mr.app_on_servo_enable = app_on_servo_enable;
     mr.app_on_servo_stop = app_on_servo_stop;
+    mr.app_on_servo_left = app_on_servo_left;
+    mr.app_on_servo_right = app_on_servo_right;
     rargs.ul = &link;
     rargs.mr = &mr;
 
